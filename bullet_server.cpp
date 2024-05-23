@@ -1,5 +1,8 @@
 #include "bullet_server.h"
 
+#include "scene/resources/world_2d.h"
+#include "scene/main/viewport.h"
+
 void BulletServer::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_READY: {
@@ -43,8 +46,9 @@ void BulletServer::_notification(int p_what) {
 }
 
 void BulletServer::_process_bullets(float delta) {
+	ERR_FAIL_COND(!is_inside_tree());
 	Vector<int> bullet_indices_to_clear;
-	PhysicsDirectSpaceState2D *space_state = get_world_2d()->get_direct_space_state();
+	PhysicsDirectSpaceState2D *space_state = get_viewport()->find_world_2d()->get_direct_space_state();
 
 	for (int i = 0; i < live_bullets.size(); i++) {
 		Bullet *bullet = live_bullets[i];
@@ -57,12 +61,10 @@ void BulletServer::_process_bullets(float delta) {
 		} else if (play_area_mode == INFINITE || play_area_rect.has_point(bullet->get_position())) {
 			bullet->update(delta);
 			_handle_collisions(bullet, space_state);
+		} else if (play_area_allow_incoming && bullet->get_direction().dot(play_area_rect.position + play_area_rect.size / 2 - bullet->get_position()) >= 0) {
+			bullet->update(delta);
 		} else {
-			if (play_area_allow_incoming && bullet->get_direction().dot(play_area_rect.position + play_area_rect.size / 2 - bullet->get_position()) >= 0) {
-				bullet->update(delta);
-			} else {
-				bullet->pop();
-			}
+			bullet->pop();
 		}
 	}
 
@@ -116,8 +118,9 @@ void BulletServer::_init_bullets() {
 }
 
 void BulletServer::_create_bullet() {
+	ERR_FAIL_COND(!is_inside_tree());
 	Bullet *bullet = memnew(Bullet);
-	RS::get_singleton()->canvas_item_set_parent(bullet->get_ci_rid(), get_canvas_item());
+	RS::get_singleton()->canvas_item_set_parent(bullet->get_ci_rid(), get_viewport()->find_world_2d()->get_canvas());
 	dead_bullets.insert(0, bullet);
 }
 
@@ -134,10 +137,9 @@ void BulletServer::_update_play_area() {
 	if (play_area_mode != VIEWPORT) {
 		return;
 	}
-	Transform2D canvas_transform = get_canvas_transform();
-	Vector2 view_pos = -canvas_transform.get_origin() / canvas_transform.get_scale();
-	Vector2 view_size = get_viewport_rect().size / canvas_transform.get_scale();
-	play_area_rect = Rect2(view_pos, view_size).grow(play_area_margin);
+	
+	ERR_FAIL_COND(!is_inside_tree());
+	play_area_rect = get_viewport()->get_visible_rect().grow(play_area_margin);
 }
 
 void BulletServer::spawn_bullet(const Ref<BulletType> &p_type, const Vector2 &p_position, const Vector2 &p_direction) {

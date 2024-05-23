@@ -5,16 +5,13 @@
 #include "bullet_server_relay.h"
 #include "bullet_type.h"
 
-#include "core/config/engine.h"
-#include "core/os/os.h"
-#include "scene/2d/node_2d.h"
-#include "scene/resources/world_2d.h"
+#include "scene/main/node.h"
 #include "servers/physics_server_2d.h"
 
 #include <vector>
 
-class BulletServer : public Node2D {
-	GDCLASS(BulletServer, Node2D);
+class BulletServer : public Node {
+	GDCLASS(BulletServer, Node);
 
 public:
 	enum AreaMode {
