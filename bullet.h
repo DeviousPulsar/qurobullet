@@ -2,11 +2,8 @@
 #define BULLET_H
 
 #include "bullet_type.h"
-#include "core/math/rect2.h"
 #include "core/math/transform_2d.h"
 #include "core/object/object.h"
-#include "core/object/ref_counted.h"
-#include "scene/resources/texture.h"
 
 class Bullet : public Object {
 	GDCLASS(Bullet, Object);

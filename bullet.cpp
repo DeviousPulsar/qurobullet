@@ -32,7 +32,7 @@ bool Bullet::is_popped() {
 }
 
 bool Bullet::can_collide() {
-	return type.is_valid() && (!type->get_collision_shape().is_null() && type->get_collision_mask() != 0);
+	return !is_popped() && type.is_valid() && !type->get_collision_shape().is_null() && type->get_collision_mask() != 0;
 }
 
 void Bullet::_update_offset() {
@@ -141,15 +141,18 @@ void Bullet::_update_appearance(const Ref<BulletType> &p_type) {
 		RenderingServer *rs = RS::get_singleton();
 		Ref<Texture2D> old_tex = type.is_valid() ? type->get_texture() : NULL;
 		Ref<Texture2D> new_tex = p_type->get_texture();
+
 		if (new_tex.is_null()) {
 			rs->canvas_item_clear(ci_rid);
 		} else if (old_tex != new_tex) {
 			rs->canvas_item_clear(ci_rid);
-			rs->canvas_item_add_texture_rect(ci_rid, Rect2(-new_tex->get_size() / 2, new_tex->get_size()), new_tex->get_rid());
+			new_tex->draw(ci_rid, -new_tex->get_size()/2);
 		}
+
 		if (p_type->get_material().is_valid()) {
 			rs->canvas_item_set_material(ci_rid, p_type->get_material()->get_rid());
 		}
+		
 		rs->canvas_item_set_modulate(ci_rid, p_type->get_modulate());
 		rs->canvas_item_set_light_mask(ci_rid, p_type->get_light_mask());
 	}
