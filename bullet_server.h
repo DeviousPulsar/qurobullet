@@ -39,7 +39,7 @@ private:
 
 	void _process_bullets(float delta);
 
-	void _handle_collisions(Bullet *bullet, PhysicsDirectSpaceState2D *space_state);
+	void _handle_collisions(Bullet* bullet, PhysicsDirectSpaceState2D* space_state, Dictionary out);
 
 	void _init_bullets();
 	void _create_bullet();

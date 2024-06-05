@@ -48,10 +48,12 @@ void BulletServer::_notification(int p_what) {
 void BulletServer::_process_bullets(float delta) {
 	ERR_FAIL_COND(!is_inside_tree());
 	Vector<int> bullet_indices_to_clear;
-	PhysicsDirectSpaceState2D *space_state = get_viewport()->find_world_2d()->get_direct_space_state();
+	PhysicsDirectSpaceState2D* space_state = get_viewport()->find_world_2d()->get_direct_space_state();
+
+	Dictionary collision_info = Dictionary();
 
 	for (int i = 0; i < live_bullets.size(); i++) {
-		Bullet *bullet = live_bullets[i];
+		Bullet* bullet = live_bullets[i];
 		RS::get_singleton()->canvas_item_set_draw_index(bullet->get_ci_rid(), i);
 
 		if (bullet->is_popped()) {
@@ -60,7 +62,7 @@ void BulletServer::_process_bullets(float delta) {
 			bullet->pop();
 		} else if (play_area_mode == INFINITE || play_area_rect.has_point(bullet->get_position())) {
 			bullet->update(delta);
-			_handle_collisions(bullet, space_state);
+			_handle_collisions(bullet, space_state, collision_info);
 		} else if (play_area_allow_incoming && bullet->get_direction().dot(play_area_rect.position + play_area_rect.size / 2 - bullet->get_position()) >= 0) {
 			bullet->update(delta);
 		} else {
@@ -69,13 +71,17 @@ void BulletServer::_process_bullets(float delta) {
 	}
 
 	for (int i = 0; i < bullet_indices_to_clear.size(); i++) {
-		Bullet *bullet = live_bullets[bullet_indices_to_clear[i] - i];
+		Bullet* bullet = live_bullets[bullet_indices_to_clear[i] - i];
 		live_bullets.remove_at(bullet_indices_to_clear[i] - i);
 		dead_bullets.insert(0, bullet);
 	}
+
+	if (!collision_info.is_empty()) {
+		emit_signal("collisions_detected", collision_info);
+	}
 }
 
-void BulletServer::_handle_collisions(Bullet *bullet, PhysicsDirectSpaceState2D *space_state) {
+void BulletServer::_handle_collisions(Bullet* bullet, PhysicsDirectSpaceState2D* space_state, Dictionary out) {
 	if (!bullet->can_collide()) {
 		return;
 	}
@@ -95,16 +101,17 @@ void BulletServer::_handle_collisions(Bullet *bullet, PhysicsDirectSpaceState2D 
 
 	int collisions = space_state->intersect_shape(shape_params, results.ptrw(), results.size());
 	if (collisions > 0) {
-		Array colliders;
-		Array shapes;
-		colliders.resize(collisions);
-		shapes.resize(collisions);
-		for (int c = 0; c < collisions; c++) {
-			colliders[c] = results[c].collider;
-			shapes[c] = results[c].shape;
+		Array list = Array();
+		for (int i = 0; i < collisions; i++) {
+			Dictionary dict;
+			dict["rid"] = results[i].rid;
+			dict["collider_id"] = results[i].collider_id;
+			dict["collider"] = results[i].collider;
+			dict["shape"] = results[i].shape;
+			list.append(dict);
 		}
-		emit_signal("collision_detected", bullet, colliders);
-		emit_signal("collision_shape_detected", bullet, colliders, shapes);
+		out[bullet] = list;
+
 		if (pop_on_collide) {
 			bullet->pop();
 		}
@@ -339,8 +346,7 @@ void BulletServer::_bind_methods() {
 	ADD_GROUP("Relay", "relay_");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "relay_autoconnect"), "set_relay_autoconnect", "get_relay_autoconnect");
 
-	ADD_SIGNAL(MethodInfo("collision_detected", PropertyInfo(Variant::OBJECT, "bullet", PROPERTY_HINT_RESOURCE_TYPE, "Bullet"), PropertyInfo(Variant::ARRAY, "colliders")));
-	ADD_SIGNAL(MethodInfo("collision_shape_detected", PropertyInfo(Variant::OBJECT, "bullet", PROPERTY_HINT_RESOURCE_TYPE, "Bullet"), PropertyInfo(Variant::ARRAY, "colliders"), PropertyInfo(Variant::ARRAY, "shapes")));
+	ADD_SIGNAL(MethodInfo("collisions_detected", PropertyInfo(Variant::DICTIONARY, "collisions")));
 	BIND_ENUM_CONSTANT(VIEWPORT);
 	BIND_ENUM_CONSTANT(MANUAL);
 	BIND_ENUM_CONSTANT(INFINITE);
