@@ -34,6 +34,7 @@ private:
 	Rect2 play_area_rect;
 	float play_area_margin;
 	bool play_area_allow_incoming;
+	float play_area_max_incoming_dist;
 
 	bool relay_autoconnect;
 
@@ -46,6 +47,8 @@ private:
 	void _uninit_bullets();
 
 	void _update_play_area();
+
+	bool _bullet_trajectory_valid(const Vector2 &p_pos, const Vector2 &p_dir) const;
 
 protected:
 	static void _bind_methods();
@@ -88,6 +91,9 @@ public:
 
 	void set_play_area_allow_incoming(bool p_enabled);
 	bool get_play_area_allow_incoming() const;
+
+	void set_play_area_max_incoming_dist(float p_dist);
+	float get_play_area_max_incoming_dist() const;
 
 	void set_relay_autoconnect(bool p_enabled);
 	bool get_relay_autoconnect() const;
