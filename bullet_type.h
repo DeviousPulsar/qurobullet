@@ -118,6 +118,8 @@ public:
 	void set_custom_data(const Dictionary &p_data);
 	Dictionary get_custom_data() const;
 
+	bool equals(const Ref<BulletType> right) const;
+
 	BulletType();
 	~BulletType();
 };
