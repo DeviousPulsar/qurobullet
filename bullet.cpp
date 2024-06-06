@@ -12,9 +12,8 @@ void Bullet::spawn(const Ref<BulletType> &p_type, const Vector2 &p_position, con
 }
 
 void Bullet::update(float delta) {
-	float current_speed = type->get_speed() + type->get_linear_acceleration() * time;
 	set_direction(direction.rotated(Math::deg_to_rad(type->get_curve_rate()) * delta));
-	position += direction * current_speed * delta;
+	position += direction * get_current_speed() * delta;
 	_update_offset();
 	time += delta;
 	if (!Math::is_zero_approx(type->get_lifetime()) && time > type->get_lifetime()) {
@@ -117,6 +116,10 @@ float Bullet::get_rotation() const {
 	return rotation;
 }
 
+float Bullet::get_current_speed() const {
+	return type->get_speed() + type->get_linear_acceleration() * time;
+}
+
 Transform2D Bullet::get_transform() {
 	Transform2D t;
 	t.set_origin(position);
@@ -182,6 +185,7 @@ void Bullet::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_rotation", "rotation"), &Bullet::set_rotation);
 	ClassDB::bind_method(D_METHOD("get_rotation"), &Bullet::get_rotation);
 
+	ClassDB::bind_method(D_METHOD("get_current_speed"), &Bullet::get_current_speed);
 	ClassDB::bind_method(D_METHOD("get_transform"), &Bullet::get_transform);
 
 	ClassDB::bind_method(D_METHOD("get_ci_rid"), &Bullet::get_ci_rid);

@@ -51,6 +51,7 @@ public:
 	void set_rotation(float p_radians);
 	float get_rotation() const;
 
+	float get_current_speed() const;
 	Transform2D get_transform();
 
 	void set_ci_rid(const RID &p_rid);
