@@ -395,7 +395,7 @@ void BulletServer::_bind_methods() {
 	ADD_GROUP("Play Area", "play_area_");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "play_area_mode", PROPERTY_HINT_ENUM, "Viewport,Manual,Infinite"), "set_play_area_mode", "get_play_area_mode");
 	ADD_PROPERTY(PropertyInfo(Variant::RECT2, "play_area_rect"), "set_play_area_rect", "get_play_area_rect");
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "play_area_margin", PROPERTY_HINT_RANGE, "0,300,0.01,or_lesser,or_greater"), "set_play_area_margin", "get_play_area_margin");
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "play_area_margin", PROPERTY_HINT_RANGE, "0,300,0.01,or_less,or_greater"), "set_play_area_margin", "get_play_area_margin");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "play_area_allow_incoming"), "set_play_area_allow_incoming", "get_play_area_allow_incoming");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "play_area_max_incoming_dist", PROPERTY_HINT_RANGE, "0,10000,10,or_greater"), "set_play_area_max_incoming_dist", "get_play_area_max_incoming_dist");
 
