@@ -49,8 +49,8 @@ void BulletServer::_process_bullets(float delta) {
 	ERR_FAIL_COND(!is_inside_tree());
 	Vector<int> bullet_indices_to_clear;
 	PhysicsDirectSpaceState2D* space_state = get_viewport()->find_world_2d()->get_direct_space_state();
-
 	Dictionary collision_info = Dictionary();
+	Array popped_bullets = Array();
 
 	for (int i = 0; i < live_bullets.size(); i++) {
 		Bullet* bullet = live_bullets[i];
@@ -72,12 +72,17 @@ void BulletServer::_process_bullets(float delta) {
 
 	for (int i = 0; i < bullet_indices_to_clear.size(); i++) {
 		Bullet* bullet = live_bullets[bullet_indices_to_clear[i] - i];
+		popped_bullets.append(bullet);
 		live_bullets.remove_at(bullet_indices_to_clear[i] - i);
 		dead_bullets.insert(0, bullet);
 	}
 
 	if (!collision_info.is_empty()) {
 		emit_signal("collisions_detected", collision_info);
+	}
+
+	if (!popped_bullets.is_empty()) {
+		emit_signal("bullets_popped", popped_bullets);
 	}
 }
 
@@ -347,6 +352,7 @@ void BulletServer::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "relay_autoconnect"), "set_relay_autoconnect", "get_relay_autoconnect");
 
 	ADD_SIGNAL(MethodInfo("collisions_detected", PropertyInfo(Variant::DICTIONARY, "collisions")));
+	ADD_SIGNAL(MethodInfo("bullets_popped", PropertyInfo(Variant::ARRAY, "bullets")));
 	BIND_ENUM_CONSTANT(VIEWPORT);
 	BIND_ENUM_CONSTANT(MANUAL);
 	BIND_ENUM_CONSTANT(INFINITE);
