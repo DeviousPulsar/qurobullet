@@ -194,6 +194,22 @@ Dictionary BulletType::get_custom_data() const {
 	return custom_data;
 }
 
+bool BulletType::equals(const Ref<BulletType> other) const {
+	return (speed == other->get_speed() &&
+			damage == other->get_damage() &&
+			lifetime == other->get_lifetime() &&
+			linear_acceleration == other->get_linear_acceleration() &&
+			curve_rate == other->get_curve_rate() &&
+			h_wave_type == other->get_h_wave_type() &&
+			h_wave_amplitude == other->get_h_wave_amplitude() &&
+			h_wave_frequency == other->get_h_wave_frequency() &&
+			v_wave_type == other->get_v_wave_type() &&
+			v_wave_amplitude == other->get_v_wave_amplitude() &&
+			v_wave_frequency == other->get_v_wave_frequency() &&
+			custom_data == other->get_custom_data()
+	);
+}
+
 void BulletType::_validate_property(PropertyInfo &property) const {
 	if ((property.name == "h_wave_amplitude" || property.name == "h_wave_frequency") && h_wave_type == NONE) {
 		property.usage = PROPERTY_USAGE_STORAGE;
@@ -275,6 +291,8 @@ void BulletType::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_custom_data", "custom_data"), &BulletType::set_custom_data);
 	ClassDB::bind_method(D_METHOD("get_custom_data"), &BulletType::get_custom_data);
+
+	ClassDB::bind_method(D_METHOD("equals", "other"), &BulletType::equals);
 
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "speed", PROPERTY_HINT_RANGE, "0,500,0.01,or_greater"), "set_speed", "get_speed");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "damage", PROPERTY_HINT_RANGE, "0,100,1,or_greater"), "set_damage", "get_damage");
