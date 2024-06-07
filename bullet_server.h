@@ -3,7 +3,7 @@
 
 #include "bullet.h"
 #include "bullet_server_relay.h"
-#include "bullet_type.h"
+#include "resource/bullet_type.h"
 
 #include "scene/main/node.h"
 #include "servers/physics_server_2d.h"

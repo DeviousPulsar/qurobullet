@@ -1,7 +1,7 @@
 #ifndef BULLET_H
 #define BULLET_H
 
-#include "bullet_type.h"
+#include "resource/bullet_type.h"
 #include "core/math/transform_2d.h"
 #include "core/object/object.h"
 

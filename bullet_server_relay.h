@@ -1,7 +1,7 @@
 #ifndef BULLETSERVERRELAY_H
 #define BULLETSERVERRELAY_H
 
-#include "bullet_type.h"
+#include "resource/bullet_type.h"
 #include "core/object/object.h"
 
 class BulletServerRelay : public Object {

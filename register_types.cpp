@@ -6,7 +6,7 @@
 #include "bullet_server.h"
 #include "bullet_server_relay.h"
 #include "bullet_spawner.h"
-#include "bullet_type.h"
+#include "resource/bullet_type.h"
 #include "core/config/engine.h"
 #include "core/object/class_db.h"
 
