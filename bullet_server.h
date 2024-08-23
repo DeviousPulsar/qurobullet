@@ -34,7 +34,6 @@ private:
 	Rect2 play_area_rect;
 	float play_area_margin;
 	bool play_area_allow_incoming;
-	float play_area_max_incoming_dist;
 
 	bool relay_autoconnect;
 
@@ -91,9 +90,6 @@ public:
 
 	void set_play_area_allow_incoming(bool p_enabled);
 	bool get_play_area_allow_incoming() const;
-
-	void set_play_area_max_incoming_dist(float p_dist);
-	float get_play_area_max_incoming_dist() const;
 
 	void set_relay_autoconnect(bool p_enabled);
 	bool get_relay_autoconnect() const;
