@@ -8,13 +8,24 @@
 #include "scene/resources/world_2d.h"
 
 class Bullet : public Object {
+public:
+	enum State {
+		LIVE,
+		UNINITIALIZED,
+		POPPED_OUT_OF_BOUNDS,
+		POPPED_LIFETIME_SERVER,
+		POPPED_LIFETIME_BULLET,
+		POPPED_COLLIDE,
+		POPPED_REQUESTED
+	};
+
+private:
 	GDCLASS(Bullet, Object);
 
 	float damage;
 
 	float time;
-	//bool popped;
-	int pop_reason;
+	Bullet::State state;
 
 	Vector2 position;
 
@@ -31,13 +42,15 @@ protected:
 	static void _bind_methods();
 
 public:
-	void spawn(const Ref<BulletPath> &p_path, const Vector2 &p_init_pos, const Vector2 &p_init_dir, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data);
+	void spawn(const Ref<BulletPath> &p_path, const Vector2 &p_init_pos, const Vector2 &p_init_dir, 
+			const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data);
 
 	void update(float delta);
 
-	void pop(int p_pop_reason);
+	void request_pop();
+	void pop(Bullet::State p_pop_reason);
 	bool is_popped();
-	int get_pop_reason();
+	Bullet::State get_state();
 
 	bool can_collide();
 
@@ -73,4 +86,5 @@ public:
 	~Bullet();
 };
 
+VARIANT_ENUM_CAST(Bullet::State);
 #endif

@@ -47,7 +47,7 @@ void BulletServer::_notification(int p_what) {
 
 void BulletServer::_process_bullets(float delta) {
 	ERR_FAIL_COND(!is_inside_tree());
-	Vector<Vector2i> bullet_indices_to_clear;
+	Vector<int> bullet_indices_to_clear;
 	PhysicsDirectSpaceState2D* space_state = get_viewport()->find_world_2d()->get_direct_space_state();
 	Dictionary collision_info = Dictionary();
 	Array popped_bullets = Array();
@@ -57,25 +57,35 @@ void BulletServer::_process_bullets(float delta) {
 		RS::get_singleton()->canvas_item_set_draw_index(bullet->get_ci_rid(), i);
 
 		if (bullet->is_popped()) {
-			bullet_indices_to_clear.push_back(Vector2i(i, bullet->get_pop_reason()));
+			bullet_indices_to_clear.push_back(i);
 		} else if (max_lifetime >= 0.001 && bullet->get_time() > max_lifetime) {
-			bullet->pop(1);
-			//bullet_indices_to_clear.push_back(i);
+			bullet->pop(Bullet::POPPED_LIFETIME_SERVER);
+			bullet_indices_to_clear.push_back(i);
 		} else if (play_area_mode == INFINITE || play_area_rect.has_point(bullet->get_position())) {
 			bullet->update(delta);
 			_handle_collisions(bullet, space_state, collision_info);
 		} else if (_bullet_trajectory_valid(bullet->get_position(), bullet->get_direction())) {
 			bullet->update(delta);
 		} else {
-			bullet->pop(2);
-			//bullet_indices_to_clear.push_back(i);
+			bullet->pop(Bullet::POPPED_OUT_OF_BOUNDS);
+			bullet_indices_to_clear.push_back(i);
 		}
 	}
 
 	for (int i = 0; i < bullet_indices_to_clear.size(); i++) {
-		Bullet* bullet = live_bullets[bullet_indices_to_clear[i][0] - i];
-		popped_bullets.append(bullet_indices_to_clear[i]);
-		live_bullets.remove_at(bullet_indices_to_clear[i][0] - i);
+		Bullet* bullet = live_bullets[bullet_indices_to_clear[i] - i];
+
+		Dictionary dict = Dictionary();
+		dict["damage"] = bullet->get_damage();
+		dict["time"] = bullet->get_time();
+		dict["reason_popped"] = bullet->get_state();
+		dict["position"] = bullet->get_position();
+		dict["path"] = bullet->get_path();
+		dict["texture"] = bullet->get_texture();
+		dict["custom_data"] = bullet->get_custom_data();
+		popped_bullets.append(dict);
+
+		live_bullets.remove_at(bullet_indices_to_clear[i] - i);
 		dead_bullets.insert(0, bullet);
 	}
 
@@ -112,7 +122,7 @@ void BulletServer::_handle_collisions(Bullet* bullet, PhysicsDirectSpaceState2D*
 	if (collisions > 0) {
 		Array list = Array();
 		for (int i = 0; i < collisions; i++) {
-			Dictionary dict;
+			Dictionary dict = Dictionary();
 			dict["rid"] = results[i].rid;
 			dict["collider_id"] = results[i].collider_id;
 			dict["collider"] = results[i].collider;
@@ -122,7 +132,7 @@ void BulletServer::_handle_collisions(Bullet* bullet, PhysicsDirectSpaceState2D*
 		out[bullet] = list;
 
 		if (pop_on_collide) {
-			bullet->pop(5);
+			bullet->pop(Bullet::POPPED_COLLIDE);
 		}
 	}
 }
@@ -220,7 +230,7 @@ void BulletServer::spawn_volley(const Ref<BulletPath> &p_path, const Vector2 &p_
 
 void BulletServer::clear_bullets() {
 	for (int i = 0; i < live_bullets.size(); i++) {
-		live_bullets[i]->pop(99999);
+		live_bullets[i]->pop(Bullet::POPPED_REQUESTED);
 	}
 }
 

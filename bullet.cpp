@@ -2,8 +2,7 @@
 
 void Bullet::spawn(const Ref<BulletPath> &p_path, const Vector2 &p_init_pos, const Vector2 &p_init_dir, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data) {
 	time = 0.0;
-	//popped = false;
-	pop_reason = 0;
+	state = Bullet::LIVE;
 
 	set_texture(p_texture);
 	RS::get_singleton()->canvas_item_set_visible(ci_rid, true);
@@ -19,22 +18,31 @@ void Bullet::update(float delta) {
 	time += delta;
 
 	if (!Math::is_zero_approx(path->get_lifetime()) && time > path->get_lifetime()) {
-		pop(100);
+		pop(Bullet::POPPED_LIFETIME_BULLET);
 	}
 }
 
-void Bullet::pop(int p_pop_reason) {
-	//popped = true;
-	pop_reason = p_pop_reason;
+void Bullet::request_pop() {
+	pop(Bullet::POPPED_REQUESTED);
+}
+
+
+void Bullet::pop(Bullet::State p_state) {
+	if (p_state == Bullet::LIVE || p_state == Bullet::UNINITIALIZED) {
+		WARN_PRINT("Cannot pop bullet by moving into BulletState " + p_state);
+		return;
+	}
+
+	state = p_state;
 	RS::get_singleton()->canvas_item_set_visible(ci_rid, false);
 }
 
 bool Bullet::is_popped() {
-	return pop_reason != 0;
+	return state != Bullet::LIVE;
 }
 
-int Bullet::get_pop_reason() {
-	return pop_reason;
+Bullet::State Bullet::get_state() {
+	return state;
 }
 
 bool Bullet::can_collide() {
@@ -47,6 +55,14 @@ void Bullet::set_time(float p_time) {
 
 float Bullet::get_time() const {
 	return time;
+}
+
+void Bullet::set_damage(float p_amount) {
+	damage = p_amount;
+}
+
+float Bullet::get_damage() const {
+	return damage;
 }
 
 void Bullet::set_texture(const Ref<BulletTexture> &p_texture) {
@@ -110,6 +126,14 @@ RID Bullet::get_ci_rid() const {
 	return ci_rid;
 }
 
+void Bullet::set_custom_data(const Dictionary &p_custom_data) {
+	custom_data = p_custom_data;
+}
+
+Dictionary Bullet::get_custom_data() const {
+	return custom_data;
+}
+
 void Bullet::_update_appearance(const Ref<BulletTexture> &p_texture) {
 	if (p_texture.is_valid()) {
 		RenderingServer *rs = RS::get_singleton();
@@ -137,7 +161,7 @@ void Bullet::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("update", "delta"), &Bullet::update);
 
-	ClassDB::bind_method(D_METHOD("pop"), &Bullet::pop);
+	ClassDB::bind_method(D_METHOD("pop"), &Bullet::request_pop);
 	ClassDB::bind_method(D_METHOD("is_popped"), &Bullet::is_popped);
 
 	ClassDB::bind_method(D_METHOD("can_collide"), &Bullet::can_collide);
@@ -161,6 +185,14 @@ void Bullet::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_transform"), &Bullet::get_transform);
 
 	ClassDB::bind_method(D_METHOD("get_ci_rid"), &Bullet::get_ci_rid);
+
+	BIND_ENUM_CONSTANT(LIVE);
+	BIND_ENUM_CONSTANT(UNINITIALIZED);
+	BIND_ENUM_CONSTANT(POPPED_OUT_OF_BOUNDS);
+	BIND_ENUM_CONSTANT(POPPED_LIFETIME_SERVER);
+	BIND_ENUM_CONSTANT(POPPED_LIFETIME_BULLET);
+	BIND_ENUM_CONSTANT(POPPED_COLLIDE);
+	BIND_ENUM_CONSTANT(POPPED_REQUESTED);
 }
 
 Bullet::Bullet() {
@@ -168,9 +200,10 @@ Bullet::Bullet() {
 	position = Vector2();
 	texture = Ref<BulletTexture>();
 	path = Ref<BulletPath>();
-	//popped = true;
-	pop_reason = -1;
+	custom_data = Dictionary();
+	state = Bullet::UNINITIALIZED;
 	time = 0;
+	damage = 0;
 }
 
 Bullet::~Bullet() {
