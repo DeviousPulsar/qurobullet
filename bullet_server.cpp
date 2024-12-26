@@ -47,7 +47,7 @@ void BulletServer::_notification(int p_what) {
 
 void BulletServer::_process_bullets(float delta) {
 	ERR_FAIL_COND(!is_inside_tree());
-	Vector<int> bullet_indices_to_clear;
+	Vector<Vector2i> bullet_indices_to_clear;
 	PhysicsDirectSpaceState2D* space_state = get_viewport()->find_world_2d()->get_direct_space_state();
 	Dictionary collision_info = Dictionary();
 	Array popped_bullets = Array();
@@ -57,23 +57,25 @@ void BulletServer::_process_bullets(float delta) {
 		RS::get_singleton()->canvas_item_set_draw_index(bullet->get_ci_rid(), i);
 
 		if (bullet->is_popped()) {
-			bullet_indices_to_clear.push_back(i);
+			bullet_indices_to_clear.push_back(Vector2i(i, bullet->get_pop_reason()));
 		} else if (max_lifetime >= 0.001 && bullet->get_time() > max_lifetime) {
-			bullet->pop();
+			bullet->pop(1);
+			//bullet_indices_to_clear.push_back(i);
 		} else if (play_area_mode == INFINITE || play_area_rect.has_point(bullet->get_position())) {
 			bullet->update(delta);
 			_handle_collisions(bullet, space_state, collision_info);
 		} else if (_bullet_trajectory_valid(bullet->get_position(), bullet->get_direction())) {
 			bullet->update(delta);
 		} else {
-			bullet->pop();
+			bullet->pop(2);
+			//bullet_indices_to_clear.push_back(i);
 		}
 	}
 
 	for (int i = 0; i < bullet_indices_to_clear.size(); i++) {
-		Bullet* bullet = live_bullets[bullet_indices_to_clear[i] - i];
-		popped_bullets.append(bullet);
-		live_bullets.remove_at(bullet_indices_to_clear[i] - i);
+		Bullet* bullet = live_bullets[bullet_indices_to_clear[i][0] - i];
+		popped_bullets.append(bullet_indices_to_clear[i]);
+		live_bullets.remove_at(bullet_indices_to_clear[i][0] - i);
 		dead_bullets.insert(0, bullet);
 	}
 
@@ -92,17 +94,19 @@ void BulletServer::_handle_collisions(Bullet* bullet, PhysicsDirectSpaceState2D*
 	}
 	Vector<PhysicsDirectSpaceState2D::ShapeResult> results = Vector<PhysicsDirectSpaceState2D::ShapeResult>();
 	results.resize(max_collisions_per_bullet);
-	Ref<BulletType> b_type = bullet->get_type();
+
+	Ref<BulletTexture> b_tex = bullet->get_texture();
 	PhysicsDirectSpaceState2D::ShapeParameters shape_params = PhysicsDirectSpaceState2D::ShapeParameters();
 
-	shape_params.shape_rid = b_type->get_collision_shape()->get_rid();
+	shape_params.shape_rid = b_tex->get_collision_shape()->get_rid();
 	shape_params.transform = bullet->get_transform();
 	shape_params.motion = Vector2(0, 0);
 	shape_params.margin = 0.0;
 	shape_params.exclude = HashSet<RID>();
-	shape_params.collision_mask = b_type->get_collision_mask();
-	shape_params.collide_with_bodies = b_type->get_collision_detect_bodies();
-	shape_params.collide_with_areas = b_type->get_collision_detect_areas();
+	shape_params.collision_mask = b_tex->get_collision_mask();
+	shape_params.collide_with_bodies = b_tex->get_collision_detect_bodies();
+	shape_params.collide_with_areas = b_tex->get_collision_detect_areas();
+
 
 	int collisions = space_state->intersect_shape(shape_params, results.ptrw(), results.size());
 	if (collisions > 0) {
@@ -118,7 +122,7 @@ void BulletServer::_handle_collisions(Bullet* bullet, PhysicsDirectSpaceState2D*
 		out[bullet] = list;
 
 		if (pop_on_collide) {
-			bullet->pop();
+			bullet->pop(5);
 		}
 	}
 }
@@ -187,7 +191,7 @@ bool BulletServer::_bullet_trajectory_valid(const Vector2 &p_pos, const Vector2 
 	return true;
 }
 
-void BulletServer::spawn_bullet(const Ref<BulletType> &p_type, const Vector2 &p_position, const Vector2 &p_direction) {
+void BulletServer::spawn_bullet(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Vector2 &p_direction, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data) {
 	if (!_bullet_trajectory_valid(p_position, p_direction)) {
 		return;
 	}
@@ -202,21 +206,21 @@ void BulletServer::spawn_bullet(const Ref<BulletType> &p_type, const Vector2 &p_
 		live_bullets.remove_at(live_bullets.size() - 1);
 	}
 
-	bullet->spawn(p_type, p_position, p_direction);
+	bullet->spawn(p_path, p_position, p_direction, p_texture, p_custom_data);
 	RS::get_singleton()->canvas_item_set_draw_index(bullet->get_ci_rid(), 0);
 	live_bullets.insert(0, bullet);
 }
 
-void BulletServer::spawn_volley(const Ref<BulletType> &p_type, const Vector2 &p_origin, const Array &p_volley) {
+void BulletServer::spawn_volley(const Ref<BulletPath> &p_path, const Vector2 &p_origin, const Array &p_volley, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data) {
 	for (int i = 0; i < p_volley.size(); i++) {
 		Dictionary shot = p_volley[i];
-		spawn_bullet(p_type, p_origin + shot["position"], shot["direction"]);
+		spawn_bullet(p_path, p_origin + shot["position"], shot["direction"], p_texture, p_custom_data);
 	}
 }
 
 void BulletServer::clear_bullets() {
 	for (int i = 0; i < live_bullets.size(); i++) {
-		live_bullets[i]->pop();
+		live_bullets[i]->pop(99999);
 	}
 }
 
@@ -349,8 +353,8 @@ void BulletServer::_validate_property(PropertyInfo &property) const {
 }
 
 void BulletServer::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("spawn_bullet", "type", "position", "direction"), &BulletServer::spawn_bullet);
-	ClassDB::bind_method(D_METHOD("spawn_volley", "type", "position", "volley"), &BulletServer::spawn_volley);
+	ClassDB::bind_method(D_METHOD("spawn_bullet", "path", "position", "direction", "texture", "custom_data"), &BulletServer::spawn_bullet);
+	ClassDB::bind_method(D_METHOD("spawn_volley", "path", "position", "volley",  "texture", "custom_data"), &BulletServer::spawn_volley);
 	ClassDB::bind_method(D_METHOD("clear_bullets"), &BulletServer::clear_bullets);
 
 	ClassDB::bind_method(D_METHOD("get_live_bullets"), &BulletServer::get_live_bullets);

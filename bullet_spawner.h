@@ -2,7 +2,9 @@
 #define BULLETSPAWNER_H
 
 #include "bullet_server_relay.h"
-#include "resource/bullet_type.h"
+#include "resource/bullet_path.h"
+#include "resource/bullet_texture.h"
+
 #include "core/config/engine.h"
 #include "core/config/project_settings.h"
 #include "scene/2d/node_2d.h"
@@ -41,7 +43,9 @@ private:
 	float arc_rotation;
 	float arc_offset;
 
-	Ref<BulletType> bullet_type;
+	Ref<BulletPath> bullet_path;
+	Ref<BulletTexture> bullet_texture;
+	Dictionary custom_bullet_data;
 
 	AimMode aim_mode;
 	float aim_angle;
@@ -121,8 +125,14 @@ public:
 	void set_arc_offset(float p_offset);
 	float get_arc_offset() const;
 
-	void set_bullet_type(const Ref<BulletType> &p_type);
-	Ref<BulletType> get_bullet_type() const;
+	void set_bullet_path(const Ref<BulletPath> &p_path);
+	Ref<BulletPath> get_bullet_path() const;
+
+	void set_bullet_texture(const Ref<BulletTexture> &p_texture);
+	Ref<BulletTexture> get_bullet_texture() const;
+
+	void set_custom_bullet_data(const Dictionary &p_custom_data);
+	Dictionary get_custom_bullet_data() const;
 
 	void set_aim_mode(AimMode p_mode);
 	AimMode get_aim_mode() const;

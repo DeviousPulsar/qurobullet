@@ -32,6 +32,7 @@ Ref<BulletPath> SimpleBulletPath::rotated(float p_rotation) const {
     return Ref<SimpleBulletPath>(memnew(SimpleBulletPath(
         init_speed, 
         init_rotation + p_rotation,
+        lifetime,
         linear_acceleration, 
         max_speed, 
         min_speed,
@@ -46,6 +47,7 @@ Ref<BulletPath> SimpleBulletPath::xformed(const Transform2D p_transform) const {
     return Ref<SimpleBulletPath>(memnew(SimpleBulletPath(
         init_speed*delta, 
         new_dir.angle(),
+        lifetime,
         linear_acceleration*delta, 
         max_speed*delta, 
         min_speed*delta,
@@ -137,6 +139,7 @@ void SimpleBulletPath::_bind_methods() {
 }
 
 SimpleBulletPath::SimpleBulletPath() {
+    lifetime = 0;
     init_speed = 100;
     init_rotation = 0;
     linear_acceleration = 0;
@@ -146,6 +149,7 @@ SimpleBulletPath::SimpleBulletPath() {
 }
 
 SimpleBulletPath::SimpleBulletPath(const SimpleBulletPath *p_other) {
+    lifetime = p_other->get_lifetime();
     init_speed = p_other->get_init_speed();
     init_rotation = p_other->get_init_rotation();
     linear_acceleration = p_other->get_linear_acceleration();
@@ -154,7 +158,8 @@ SimpleBulletPath::SimpleBulletPath(const SimpleBulletPath *p_other) {
     curve_rate = p_other->get_curve_rate();
 }
 
-SimpleBulletPath::SimpleBulletPath(float p_speed, float p_dir, float p_accel, float p_max_speed, float p_min_speed, float p_curve_rate) {
+SimpleBulletPath::SimpleBulletPath(float p_speed, float p_dir, float p_lifetime, float p_accel, float p_max_speed, float p_min_speed, float p_curve_rate) {
+    lifetime = p_lifetime;
     init_speed = p_speed;
     init_rotation = p_dir;
     linear_acceleration = p_accel;

@@ -6,10 +6,11 @@
 #include "bullet_server.h"
 #include "bullet_server_relay.h"
 #include "bullet_spawner.h"
-#include "resource/bullet_type.h"
+
 #include "resource/bullet_path.h"
 #include "resource/simple_bullet_path.h"
 #include "resource/bullet_texture.h"
+
 #include "core/config/engine.h"
 #include "core/object/class_db.h"
 
@@ -22,7 +23,6 @@ void initialize_qurobullet_module(ModuleInitializationLevel p_level) {
 	_bullet_server_relay = memnew(BulletServerRelay);
 
 	GDREGISTER_CLASS(Bullet);
-	GDREGISTER_CLASS(BulletType);
 	GDREGISTER_CLASS(BulletServer);
 	GDREGISTER_CLASS(BulletServerRelay);
 	GDREGISTER_CLASS(BulletSpawner);

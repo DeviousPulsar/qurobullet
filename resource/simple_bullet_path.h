@@ -52,7 +52,8 @@ public:
 
     SimpleBulletPath();
     SimpleBulletPath(const SimpleBulletPath *p_other);
-    SimpleBulletPath(float p_speed, float p_dir, float p_accel = 0, float max_speed = 500, float min_speed = -500, float p_curve_rate = 0);
+    SimpleBulletPath(float p_speed, float p_dir, float p_lifetime = 0, float p_accel = 0, 
+            float max_speed = 500, float min_speed = -500, float p_curve_rate = 0);
     ~SimpleBulletPath();
 };
 

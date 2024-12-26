@@ -4,8 +4,8 @@ Import("env")
 Import("env_modules")
 
 env_qurobullet = env_modules.Clone()
-env_qurobullet.Append(CCFLAGS=['-O2'])
-env_qurobullet.Append(CXXFLAGS=['-std=gnu++17'])
+env_qurobullet.Append(CCFLAGS=['-O2', '-Wall', '-Werror'])
+env_qurobullet.Append(CXXFLAGS=['-std=gnu++17', '-Wall', '-Werror'])
 
 env_qurobullet.add_source_files(env.modules_sources, "*.cpp")
 env_qurobullet.add_source_files(env.modules_sources, "resource/*.cpp")

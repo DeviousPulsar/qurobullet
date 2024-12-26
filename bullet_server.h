@@ -3,7 +3,8 @@
 
 #include "bullet.h"
 #include "bullet_server_relay.h"
-#include "resource/bullet_type.h"
+#include "resource/bullet_path.h"
+#include "resource/bullet_texture.h"
 
 #include "scene/main/node.h"
 #include "servers/physics_server_2d.h"
@@ -59,8 +60,8 @@ public:
 	BulletServer();
 	~BulletServer();
 
-	void spawn_bullet(const Ref<BulletType> &p_type, const Vector2 &p_position, const Vector2 &p_direction);
-	void spawn_volley(const Ref<BulletType> &p_type, const Vector2 &p_position, const Array &p_volley);
+	void spawn_bullet(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Vector2 &p_direction, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data);
+	void spawn_volley(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Array &p_volley, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data);
 
 	void clear_bullets();
 	int get_live_bullet_count();
