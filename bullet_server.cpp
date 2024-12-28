@@ -76,7 +76,6 @@ void BulletServer::_process_bullets(float delta) {
 		Bullet* bullet = live_bullets[bullet_indices_to_clear[i] - i];
 
 		Dictionary dict = Dictionary();
-		dict["damage"] = bullet->get_damage();
 		dict["time"] = bullet->get_time();
 		dict["reason_popped"] = bullet->get_state();
 		dict["position"] = bullet->get_position();

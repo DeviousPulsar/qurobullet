@@ -18,7 +18,7 @@ protected:
 	static void _bind_methods();
 
 public:
-    virtual void set_lifetime(float p_time) override;
+    void set_lifetime(float p_time);
     virtual float get_lifetime() const override;
 
     virtual Vector2 get_step(float p_time, float p_delta) const override;

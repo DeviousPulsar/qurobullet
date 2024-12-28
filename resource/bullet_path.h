@@ -8,7 +8,6 @@ class BulletPath : public Resource {
     GDCLASS(BulletPath, Resource);
 
 public:
-    virtual void set_lifetime(float p_time) = 0;
 	virtual float get_lifetime() const = 0;
 
     virtual Vector2 get_step(float p_time, float p_delta) const = 0;

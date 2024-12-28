@@ -22,8 +22,6 @@ public:
 private:
 	GDCLASS(Bullet, Object);
 
-	float damage;
-
 	float time;
 	Bullet::State state;
 
@@ -35,8 +33,6 @@ private:
 	RID ci_rid;
 
 	Dictionary custom_data;
-
-	void _update_appearance(const Ref<BulletTexture> &p_texture = NULL);
 
 protected:
 	static void _bind_methods();
@@ -56,9 +52,6 @@ public:
 
 	void set_time(float p_time);
 	float get_time() const;
-
-	void set_damage(float p_amount);
-	float get_damage() const;
 
 	void set_texture(const Ref<BulletTexture> &p_texture);
 	Ref<BulletTexture> get_texture() const;

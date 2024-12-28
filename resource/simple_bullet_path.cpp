@@ -98,8 +98,8 @@ float SimpleBulletPath::get_curve_rate() const {
 }
 
 void SimpleBulletPath::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_lifetime", "time"), &BulletPath::set_lifetime);
-	ClassDB::bind_method(D_METHOD("get_lifetime"), &BulletPath::get_lifetime);
+    ClassDB::bind_method(D_METHOD("set_lifetime", "time"), &SimpleBulletPath::set_lifetime);
+	ClassDB::bind_method(D_METHOD("get_lifetime"), &SimpleBulletPath::get_lifetime);
 
     ClassDB::bind_method(D_METHOD("get_step", "time", "delta"), &SimpleBulletPath::get_step);
 

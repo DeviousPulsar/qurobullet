@@ -14,6 +14,8 @@ void Bullet::spawn(const Ref<BulletPath> &p_path, const Vector2 &p_init_pos, con
 }
 
 void Bullet::update(float delta) {
+	ERR_FAIL_COND_MSG(!path.is_valid(), "Current path in invalid. Cannot update bullet position.");
+
 	position += path->get_step(time, delta);
 	time += delta;
 
@@ -28,10 +30,7 @@ void Bullet::request_pop() {
 
 
 void Bullet::pop(Bullet::State p_state) {
-	if (p_state == Bullet::LIVE || p_state == Bullet::UNINITIALIZED) {
-		WARN_PRINT("Cannot pop bullet by moving into BulletState " + p_state);
-		return;
-	}
+	ERR_FAIL_COND_MSG(p_state == Bullet::LIVE || p_state == Bullet::UNINITIALIZED, "Cannot pop bullet by moving into BulletState " + p_state);
 
 	state = p_state;
 	RS::get_singleton()->canvas_item_set_visible(ci_rid, false);
@@ -57,17 +56,26 @@ float Bullet::get_time() const {
 	return time;
 }
 
-void Bullet::set_damage(float p_amount) {
-	damage = p_amount;
-}
-
-float Bullet::get_damage() const {
-	return damage;
-}
-
 void Bullet::set_texture(const Ref<BulletTexture> &p_texture) {
+	ERR_FAIL_COND_MSG(!p_texture.is_valid(), "Passed BulletTexture is invalid. Cannot update.");
+
 	texture = p_texture;
-	_update_appearance(p_texture);
+
+	RenderingServer *rs = RS::get_singleton();
+	Ref<Texture2D> sprite = p_texture->get_texture();
+
+	rs->canvas_item_clear(ci_rid);
+
+	ERR_FAIL_COND_MSG(!sprite.is_valid(), "Passed BulletTexture has no Texture2D. Cannot render.");
+
+	sprite->draw(ci_rid, -sprite->get_size()/2);
+
+	if (p_texture->get_material().is_valid()) {
+		rs->canvas_item_set_material(ci_rid, p_texture->get_material()->get_rid());
+	}
+	
+	rs->canvas_item_set_modulate(ci_rid, p_texture->get_modulate());
+	rs->canvas_item_set_light_mask(ci_rid, p_texture->get_light_mask());
 }
 
 Ref<BulletTexture> Bullet::get_texture() const {
@@ -75,6 +83,7 @@ Ref<BulletTexture> Bullet::get_texture() const {
 }
 
 void Bullet::set_path(const Ref<BulletPath> &p_path) {
+	ERR_FAIL_COND_MSG(!p_path.is_valid(), "Passed BulletPath is invalid. Cannot update.");
 	path = p_path;
 	time = 0;
 }
@@ -92,18 +101,22 @@ Vector2 Bullet::get_position() const {
 }
 
 Vector2 Bullet::get_direction() const {
+	ERR_FAIL_COND_V_MSG(!path.is_valid(), Vector2(0,0), "Current path is invalid. Cannot return direction on invalid path.");
 	return path->get_direction(time);
 }
 
 Vector2 Bullet::get_velocity() const {
+	ERR_FAIL_COND_V_MSG(!path.is_valid(), Vector2(0,0), "Current path is invalid. Cannot return velocity on invalid path.");
 	return path->get_velocity(time);
 }
 
 float Bullet::get_rotation() const {
+	ERR_FAIL_COND_V_MSG(!path.is_valid(), 0, "Current path is invalid. Cannot return rotation on invalid path.");
 	return path->get_rotation(time);
 }
 
 float Bullet::get_speed() const {
+	ERR_FAIL_COND_V_MSG(!path.is_valid(), 0, "Current path is invalid. Cannot return speed on invalid path.");
 	return path->get_speed(time);
 }
 
@@ -132,28 +145,6 @@ void Bullet::set_custom_data(const Dictionary &p_custom_data) {
 
 Dictionary Bullet::get_custom_data() const {
 	return custom_data;
-}
-
-void Bullet::_update_appearance(const Ref<BulletTexture> &p_texture) {
-	if (p_texture.is_valid()) {
-		RenderingServer *rs = RS::get_singleton();
-		Ref<Texture2D> old_tex = texture.is_valid() ? texture->get_texture() : NULL;
-		Ref<Texture2D> new_tex = p_texture->get_texture();
-
-		//if (new_tex.is_null()) {
-		//	rs->canvas_item_clear(ci_rid);
-		//} else if (old_tex != new_tex) {
-			rs->canvas_item_clear(ci_rid);
-			new_tex->draw(ci_rid, -new_tex->get_size()/2);
-		//}
-
-		if (p_texture->get_material().is_valid()) {
-			rs->canvas_item_set_material(ci_rid, p_texture->get_material()->get_rid());
-		}
-		
-		rs->canvas_item_set_modulate(ci_rid, p_texture->get_modulate());
-		rs->canvas_item_set_light_mask(ci_rid, p_texture->get_light_mask());
-	}
 }
 
 void Bullet::_bind_methods() {
@@ -203,7 +194,6 @@ Bullet::Bullet() {
 	custom_data = Dictionary();
 	state = Bullet::UNINITIALIZED;
 	time = 0;
-	damage = 0;
 }
 
 Bullet::~Bullet() {
