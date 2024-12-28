@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="BulletTexture" inherits="Resource" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Resource containing appearance and collision data for [Bullet]s.
+	</brief_description>
+	<description>
+		Resource containing [Bullet] appearance and collision data.
+		Used to save together a bullet's texture configuration to its collision configuration, while allowing for less memory duplication on bullet spawn.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="collision_detect_areas" type="bool" setter="set_collision_detect_areas" getter="get_collision_detect_areas" default="true">
+			If [code]true[/code], this type of bullet will scan for areas in its collision checks.
+		</member>
+		<member name="collision_detect_bodies" type="bool" setter="set_collision_detect_bodies" getter="get_collision_detect_bodies" default="true">
+			If [code]true[/code], this type of bullet will scan for bodies in its collision checks.
+		</member>
+		<member name="collision_mask" type="int" setter="set_collision_mask" getter="get_collision_mask" default="1">
+			The physics layers to scan for determining collision detection with this type of bullet.
+		</member>
+		<member name="collision_shape" type="Shape2D" setter="set_collision_shape" getter="get_collision_shape">
+			Shape to be used for determining collision detection with this type of bullet.
+		</member>
+		<member name="face_direction" type="bool" setter="set_face_direction" getter="get_face_direction" default="false">
+			If [code]true[/code], this type of bullet will automatically rotate to face the direction in which it is travelling.
+			The rotation effect applied by this stacks with [code]rotation[/code].
+		</member>
+		<member name="light_mask" type="int" setter="set_light_mask" getter="get_light_mask" default="1">
+			The light mask for this type of bullet's [code]CanvasItem[/code].
+		</member>
+		<member name="material" type="Material" setter="set_material" getter="get_material">
+			The material applied to this type of bullet's [CanvasItem].
+		</member>
+		<member name="modulate" type="Color" setter="set_modulate" getter="get_modulate" default="Color(1, 1, 1, 1)">
+			The color that modulates this type of bullet's [CanvasItem].
+		</member>
+		<member name="rotation" type="float" setter="set_rotation" getter="get_rotation" default="0.0">
+			The rotation offset of this type of bullet, in radians.
+		</member>
+		<member name="rotation_degrees" type="float" setter="set_rotation_degrees" getter="get_rotation_degrees" default="0.0">
+			The rotation offset of this type of bullet, in degrees.
+		</member>
+		<member name="scale" type="Vector2" setter="set_scale" getter="get_scale" default="Vector2(1, 1)">
+			The scale applied to this type of bullet.
+		</member>
+		<member name="texture" type="Texture2D" setter="set_texture" getter="get_texture">
+			The texture to be drawn to this type of bullet's [CanvasItem].
+			If absent, the collision shape will be drawn instead.
+		</member>
+	</members>
+</class>

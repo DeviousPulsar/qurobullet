@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="BulletTexture" inherits="Resource" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		BulletPath for constant or linearlly changing speeds and rotations.
+	</brief_description>
+	<description>
+		BulletPath for constant or linearlly changing speeds and rotations.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="lifetime" type="float" setter="set_lifetime" getter="get_lifetime" default="0">
+            The maximum lifetime of the bullet. If 0.0, bullet will not pop automatically from exceeding it's lifetime.
+		</member>
+		<member name="speed" type="float" setter="set_speed" getter="get_speed" default="100">
+			The speed of the bullet upon spawn. May be negative.
+		</member>
+		<member name="linear_acceleration" type="float" setter="set_linear_acceleration" getter="get_linear_acceleration" default="0">
+			The rate at which the speed of the bullet changes in a second.
+		</member>
+        <member name="max_speed" type="float" setter="set_max_speed" getter="get_max_speed" default="500">
+			The maximium speed the bullet may travel at.
+		</member>
+        <member name="min_speed" type="float" setter="set_min_speed" getter="get_min_speed" default="500">
+			The minimum speed the bullet may travel at. May be negative.
+		</member>
+        <member name="rotation" type="float" setter="set_rotation" getter="get_rotation" default="0">
+			The maximium speed the bullet may travel at.
+		</member>
+	</members>
+</class>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="BulletTexture" inherits="Resource" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Abstract resource used to define bullet behaviour.
+	</brief_description>
+	<description>
+		Abstract resource defining base methods for use by [Bullet] and [BulletServer] to simulate motion of a bullet.
+        Overload this type to define custom BulletPath resource types.
+	</description>
+	<tutorials>
+	</tutorials>
+    <methods>
+        <method name="get_direction">
+            <return type="Vector2">
+            <param index="0" name="time" type="float" />
+            <description>
+                Returns the instantanious Vector2 direction after traveling along the path for [code]time[/code] seconds.
+        </method>
+        <method name="get_lifetime">
+            <return type="float">
+            <description>
+                Returns the maximum lifetime of the bullet. Return value of 0.0 means bullet will not pop automatically from exceeding it's lifetime.
+        </method>
+        <method name="get_rotation">
+            <return type="float">
+            <param index="0" name="time" type="float" />
+            <description>
+                Returns the instantanious rotation after traveling along the path for [code]time[/code] seconds.
+        </method>
+        <method name="get_speed">
+            <return type="float">
+            <param index="0" name="time" type="float" />
+            <description>
+                Returns the instantanious speed after traveling along the path for [code]time[/code] seconds.
+        </method>
+        <method name="get_step">
+            <return type="Vector2">
+            <param index="0" name="time" type="float" />
+			<param index="1" name="delta" type="float" />
+            <description>
+                Returns the change in position from moving [code]delta[/code] seconds along the path having previously moved for [code]time[/code] seconds.
+            </description>
+        </method>
+        <method name="get_velocity">
+            <return type="Vector2">
+            <param index="0" name="time" type="float" />
+            <description>
+                Returns the instantanious Vector2 velocity after traveling along the path for [code]time[/code] seconds.
+        </method>
+        <method name="rotated">
+            <return type="BulletPath">
+            <param index="0" name="rotation" type="float" />
+            <description>
+                Returns a copy itself, rotated around it's initial point by [code]rotation[/code] radians.
+        </method>
+        <method name="xformed">
+            <return type="BulletPath">
+            <param index="0" name="transform" type="Transform2D" />
+            <description>
+                Returns a copy itself, transformed by [code]transform[/code].
+        </method>
+    </methods>
+</class>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="BulletServer" inherits="Node2D" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		Node2D which creates, spawns, and processes a set pool of [Bullet] objects and reports their collisions.
+		Node which creates, spawns, and processes a set pool of [Bullet] objects and reports their collisions.
 	</brief_description>
 	<description>
-		Node2D which creates, spawns, and processes a set pool of [Bullet] objects and reports their collisions.
+		Node which creates, spawns, and processes a set pool of [Bullet] objects and reports their collisions.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -32,26 +32,32 @@
 			<description>
 				Returns an array containing all currently live [Bullet] objects. 
 				Returned array is a copy of the server's internal live bullet array. Modifying this array will have no effect on BulletServer's internal arrays, but modifications made to the [Bullet]s themselves will take effect in the game.
+				Attempting to access or modify a bullet retreived by this method after resizing the bullet pool or destorying the bullet server leads to undefined behaviour.
 			</description>
 		</method>
 		<method name="spawn_bullet">
 			<return type="void" />
-			<param index="0" name="type" type="BulletType" />
+			<param index="0" name="path" type="BulletPath" />
 			<param index="1" name="position" type="Vector2" />
 			<param index="2" name="direction" type="Vector2" />
+			<param index="3" name="texture" type="BulletTexture" />
+			<param index="4" name="custom_data" type="Dictionary" />
 			<description>
-				Spawns a [Bullet] of [code]type[/code] at [code]position[/code], firing in [code]direction[/code].
-				If every bullet in the bullet pool is currently active, the oldest active bullet is recycled and spawned instead.
+				Spawns a [Bullet] with the traits defined by [code]path[/code] and [code]texture[/code], at [code]position[/code], firing in [code]direction[/code].
+				If every bullet in the bullet pool is currently active, the oldest active bullet is recycled and spawned instead. This does not pop the recycled bullets.
 			</description>
 		</method>
 		<method name="spawn_volley">
 			<return type="void" />
-			<param index="0" name="type" type="BulletType" />
+			<param index="0" name="path" type="BulletPath" />
 			<param index="1" name="position" type="Vector2" />
 			<param index="2" name="volley" type="Array" />
+			<param index="3" name="texture" type="BulletTexture" />
+			<param index="4" name="custom_data" type="Dictionary" />
 			<description>
-				Spawns a volley of [Bullet]s of [code]type[/code], originating at [code]position[/code], with their relative spawn positions and directions determined by Spawns a [Bullet] of [code]type[/code] at [code]position[/code] from the bullet pool, firing in [code]volley[/code].
+				Spawns a volley of [Bullet]s with the traits defined by [code]path[/code] and [code]texture[/code], originating at [code]position[/code], with their relative spawn positions and directions determined by [code]volley[/code].
 				[code]volley[/code] is an [Array] of [Dictionary] items, each containing a "position" and "direction". You can build your own if you wish to spawn custom volleys.
+				If every bullet in the bullet pool is currently active, the oldest active bullets are recycled and spawned instead. This does not pop the recycled bullets.
 			</description>
 		</method>
 	</methods>
@@ -64,12 +70,12 @@
 			The max number of collisions a single [Bullet] can detect in a single frame.
 		</member>
 		<member name="max_lifetime" type="float" setter="set_max_lifetime" getter="get_max_lifetime" default="0.0">
-			The maximium lifetime of any [Bullet] managed by the server. Bullets older than this are automatically popped. Setting to 0.0 means bullets do not pop automatically.
+			The maximium lifetime of any [Bullet] managed by the server. Bullets older than this are automatically popped. Setting to 0.0 means bullets do not pop automatically from exceeding the server's max_lifetime.
 		</member>
 		<member name="play_area_allow_incoming" type="bool" setter="set_play_area_allow_incoming" getter="get_play_area_allow_incoming" default="true">
 			If [code]true[/code], bullets outside of the play area will only be automatically popped if they are moving away from it.
 			Bullets outside of the play area will not detect collisions.
-			Calculation of whether bullet is "incoming" is approximate, and based on its angle to the center of the play area, so bullets that would enter a corner of the play area at an oblique angle may still be popped.
+			No bullet will be culled if a straight line path projected from it's current position with it's  current direction intersects the play area.
 		</member>
 		<member name="play_area_margin" type="float" setter="set_play_area_margin" getter="get_play_area_margin" default="0.0">
 			The distance, in pixels, bullets controlled by this server can travel outside the the current [Viewport] before being popped. Can be negative.
@@ -77,7 +83,7 @@
 		<member name="play_area_mode" type="int" setter="set_play_area_mode" getter="get_play_area_mode" enum="BulletServer.AreaMode" default="0">
 			The current mode used to define the play area's limits.
 			[code]VIEWPORT[/code] causes the play area to automatically follow the current viewport, with a configurable margin.
-			[code]MANUAL[/code] allows the play area's [Rect2] to be defined directly.
+			[code]MANUAL[/code] allows the play area's [Rect2] to be defined directly. Uses world coordinates.
 			[code]INFINITE[/code] causes the play area to become infinite, and no bullet will pop based on location. Some other form of cleanup routine, such as [code]max_lifetime[/code], is recommended in this mode for best performance.
 		</member>
 		<member name="play_area_rect" type="Rect2" setter="set_play_area_rect" getter="get_play_area_rect" default="Rect2(0, 0, 0, 0)">
@@ -93,28 +99,46 @@
 		</member>
 	</members>
 	<signals>
-		<signal name="collision_detected">
-			<param index="0" name="bullet" type="Bullet" />
-			<param index="1" name="colliders" type="Array" />
+		<signal name="collisions_detected">
+			<param index="0" name="collisions" type="Dictionary" />
 			<description>
-				Emitted when a bullet has collided with an area or body. Contains the [Bullet] which collided and an [Array] of the collision objects it collided with.
-				Note that [BulletServer] will report collisions even with unmonitorable collision shapes, so long as they're on the same layer.
+				Emitted in once a physics frame where a bullet has collided with an area or body.
+				The collisions are returned as a dictionary where the keys are bullets that collided with something during the last physics frame, and the values are the colliders hit by the bullet stored as an array containing dictionaries with the following fields:
+				[code]collider[/code]: The colliding object.
+				[code]collider_id[/code]: The colliding object's ID.
+				[code]rid[/code]: The intersecting object's RID.
+				[code]shape[/code]: The shape index of the colliding shape.
+				Note that [BulletServer] will report collisions even on unmonitorable collision shapes, so long as they're on the same layer.
 			</description>
 		</signal>
-		<signal name="collision_shape_detected">
-			<param index="0" name="bullet" type="Bullet" />
-			<param index="1" name="colliders" type="Array" />
-			<param index="2" name="shapes" type="Array" />
+		<signal name="bullets_popped">
+			<param index="0" name="bullet" type="Array" />
 			<description>
+				Emitted in once a physics frame where a popped bullet has been cleaned by the this server.
+				The popped bullets are returned as a array containing dictionaries with the following fields:
+				[code]time[/code]: The popped bullet's final age since spawn in seconds.
+				[code]reason_popped[/code]: The reason that the bullet was popped as an enum value of type Bullet:State.
+				[code]position[/code]: The popped bullet's final position.
+				[code]path[/code]: The popped bullet's path.
+				[code]texture[/code]: The popped bullet's texture.
+				[code]custom_data[/code]: The popped bullet's custom_data feild.
 			</description>
 		</signal>
 	</signals>
 	<constants>
-		<constant name="VIEWPORT" value="0" enum="AreaMode">
+		<constant name="VIEWPORT" value="0" enum="State">
 		</constant>
-		<constant name="MANUAL" value="1" enum="AreaMode">
+		<constant name="MANUAL" value="1" enum="State">
 		</constant>
-		<constant name="INFINITE" value="2" enum="AreaMode">
+		<constant name="POPPED_OUT_OF_BOUNDS" value="2" enum="State">
+		</constant>
+		<constant name="POPPED_LIFETIME_SERVER" value="3" enum="State">
+		</constant>
+		<constant name="POPPED_LIFETIME_BULLET" value="4" enum="State">
+		</constant>
+		<constant name="POPPED_COLLIDE" value="5" enum="State">
+		</constant>
+		<constant name="POPPED_REQUESTED" value="6" enum="State">
 		</constant>
 	</constants>
 </class>

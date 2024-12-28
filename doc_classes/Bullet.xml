@@ -6,7 +6,7 @@
 	<description>
 		Representation of a controllable bullet.
 		A [Bullet] is a minimal representation of a simulated projectile. It does not perform any automatic processing or colliding of its own, instead relying on a [BulletServer] or other external script to drive it.
-		It contains state information, a [CanvasItem] [RID] to draw to, and a [BulletType] resource which defines its appearance, collision information, and behaviour.
+		It contains state information; a [CanvasItem] [RID] to draw to; a pair of [BulletTexture] and [BUlletPath] resources which define its appearance, collision information, and behaviour; and a customizable [Dictionary]. 
 	</description>
 	<tutorials>
 	</tutorials>
@@ -29,16 +29,34 @@
 				Returns a [Vector2] reprenting this [Bullet]'s current direction of travel.
 			</description>
 		</method>
+		<method name="get_path" qualifiers="const">
+			<return type="BulletPath" />
+			<description>
+				Returns the [BulletPath] currently held by this [Bullet].
+			</description>
+		</method>
 		<method name="get_position" qualifiers="const">
 			<return type="Vector2" />
 			<description>
 				Returns the current position of this [Bullet].
 			</description>
 		</method>
+		<method name="get_speed" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current speed of this [Bullet].
+			</description>
+		</method>
 		<method name="get_rotation" qualifiers="const">
 			<return type="float" />
 			<description>
-				Returns the current rotation of this [Bullet].
+				Returns the current rotation of this [Bullet] in radians.
+			</description>
+		</method>
+		<method name="get_texture" qualifiers="const">
+			<return type="BulletTexture" />
+			<description>
+				Returns the [BulletTexture] currently held by this [Bullet].
 			</description>
 		</method>
 		<method name="get_time" qualifiers="const">
@@ -53,16 +71,16 @@
 				Returns a transform representing this [Bullet]'s current position, rotation, and the scale.
 			</description>
 		</method>
-		<method name="get_type" qualifiers="const">
-			<return type="BulletType" />
+		<method name="get_velocity" qualifiers="const">
+			<return type="Vector2" />
 			<description>
-				Returns the [BulletType] currently held by this [Bullet].
+				Returns the current velocity of this [Bullet].
 			</description>
 		</method>
 		<method name="is_popped">
 			<return type="bool" />
 			<description>
-				Returns [code]true[/code] if this [Bullet] has been popped.
+				Returns [code]true[/code] if this [Bullet] has been popped or is otherwise inactive.
 			</description>
 		</method>
 		<method name="pop">
@@ -71,51 +89,54 @@
 				Marks this [Bullet] as inactive and ready to be cleaned up by the server, and disables its visibility.
 			</description>
 		</method>
-		<method name="set_direction">
-			<return type="void" />
-			<param index="0" name="direction" type="Vector2" />
-			<description>
-				Sets the [Vector2] that defines the direction in which this [Bullet] will travel.
-			</description>
-		</method>
-		<method name="set_position">
-			<return type="void" />
+		<method name="set_position" qualifiers="const">
+			<return type="Vector2" />
 			<param index="0" name="position" type="Vector2" />
 			<description>
-				Sets the position of this [Bullet].
+				Updates the current position of this [Bullet].
 			</description>
 		</method>
-		<method name="set_rotation">
+		<method name="set_path">
 			<return type="void" />
-			<param index="0" name="rotation" type="float" />
+			<param index="0" name="path" type="BulletPath" />
 			<description>
-				Sets the rotation of this [Bullet].
+				Sets the [BulletPath] that will be used to define this [Bullet]'s behaviour.
 			</description>
 		</method>
-		<method name="set_type">
+		<method name="set_texture">
 			<return type="void" />
-			<param index="0" name="type" type="BulletType" />
+			<param index="0" name="texture" type="BulletTexture" />
 			<description>
-				Sets the [BulletType] that will be used to define this [Bullet]'s appearance and behaviour.
+				Sets the [BulletTexture] that will be used to define this [Bullet]'s appearance.
 				Causes the [CanvasItem] to update to reflect texture or material changes.
 			</description>
 		</method>
 		<method name="spawn">
 			<return type="void" />
-			<param index="0" name="type" type="BulletType" />
+			<param index="0" name="path" type="BulletPath" />
 			<param index="1" name="position" type="Vector2" />
 			<param index="2" name="direction" type="Vector2" />
+			<param index="3" name="texture" type="BulletTexture" />
+			<param index="4" name="custom_data" type="Dictionary" />
 			<description>
-				Resets this [Bullet]'s age and state, then deploys it at the given [code]position[/code], in [code]direction[/code], with the traits of [code]type[/code].
+				Resets this [Bullet]'s age and state, then deploys it at the given [code]position[/code], in [code]direction[/code], with the traits defined by [code]path[/code] and [code]texture[/code].
 			</description>
 		</method>
 		<method name="update">
 			<return type="void" />
 			<param index="0" name="delta" type="float" />
 			<description>
-				Updates this [Bullet]'s age and position, using its currently loaded [BulletType].
-				Will automatically pop if the type has a lifetime limit set and this bullet's live time exceeds it.
+				Updates this [Bullet]'s age and position, using its currently loaded [BulletPath].
+				Will automatically pop if the path has a lifetime limit set and this bullet's live time exceeds it.
 			</description>
 		</method>
 	</methods>
+	<constants>
+		<constant name="LIVE" value="0" enum="AreaMode">
+		</constant>
+		<constant name="UNINITIALIZED" value="1" enum="AreaMode">
+		</constant>
+		<constant name="INFINITE" value="2" enum="AreaMode">
+		</constant>
+	</constants>
 </class>

@@ -14,14 +14,13 @@
 		<method name="can_fire" qualifiers="const">
 			<return type="bool" />
 			<description>
-				Returns [code]true[/code] if this spawner is not in the editor, in the scene tree, and has a valid [code]bullet_type[/code].
+				Returns [code]true[/code] if this spawner is not in the editor, in the scene tree, and has valid [code]bullet_path[/code] and [code]bullet_texture[/code].
 			</description>
 		</method>
 		<method name="fire">
 			<return type="void" />
 			<description>
 				Emits the "volley_fired" signal with the current parameters, to be connected to a bullet server for spawning the bullets appropiately.
-				Passes duplicate of [code]bullet_type[/code] instead of referencing the resource directly, so active bullets' type will not be modified by changes made in this spawner.
 			</description>
 		</method>
 		<method name="fire_shots">
@@ -93,9 +92,11 @@
 		<member name="autofire" type="bool" setter="set_autofire" getter="get_autofire" default="false">
 			If [code]true[/code], this spawner will automatically fire a volley once [code]interval_frames[/code] have elapsed.
 		</member>
-		<member name="bullet_type" type="BulletType" setter="set_bullet_type" getter="get_bullet_type">
-			The appearance and behavioural information used by bullets spawned by this spawner.
-			A duplicate is passed to the volley when fired, so changes in this spawner's bullet type will not retroactively affect active bullets.
+		<member name="bullet_path" type="BulletPath" setter="set_bullet_path" getter="get_bullet_path">
+			The behavioural information used by bullets spawned by this spawner.
+		</member>
+		<member name="bullet_texture" type="BulletTexture" setter="set_bullet_texture" getter="get_bullet_texture">
+			The appearance and collision information used by bullets spawned by this spawner.
 		</member>
 		<member name="interval_frames" type="int" setter="set_interval_frames" getter="get_interval_frames" default="10">
 			The number of frames to elapse before firing the next volley, if [code]autofire[/code] is enabled.
@@ -147,9 +148,11 @@
 	</members>
 	<signals>
 		<signal name="volley_fired">
-			<param index="0" name="type" type="BulletType" />
-			<param index="1" name="origin" type="Vector2" />
+			<param index="0" name="path" type="BulletPath" />
+			<param index="1" name="position" type="Vector2" />
 			<param index="2" name="volley" type="Array" />
+			<param index="3" name="texture" type="BulletTexture" />
+			<param index="4" name="custom_data" type="Dictionary" />
 			<description>
 				Emitted when a volley of bullets is fired. To be passed to a server for spawning the required volley.
 			</description>
