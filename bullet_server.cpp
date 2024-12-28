@@ -167,19 +167,24 @@ void BulletServer::_update_play_area() {
 	play_area_rect = get_viewport()->get_visible_rect().grow(play_area_margin);
 }
 
+#define OUTCODE_UP 1
+#define OUTCODE_DOWN 2
+#define OUTCODE_LEFT 4
+#define OUTCODE_RIGHT 8
+
 int _compute_out_code(const Rect2 &p_rect, const Vector2 &p_pos) {
 	int out_code = 0;
 
 	if (p_pos.y < p_rect.position.y) {
-		out_code |= 1;
+		out_code |= OUTCODE_UP;
 	} else if (p_pos.y > p_rect.position.y + p_rect.size.y) {
-		out_code |= 2;
+		out_code |= OUTCODE_DOWN;
 	}
 
 	if (p_pos.x < p_rect.position.x) {
-		out_code |= 4;
+		out_code |= OUTCODE_LEFT;
 	} else if (p_pos.x > p_rect.position.x + p_rect.size.x) {
-		out_code |= 8;
+		out_code |= OUTCODE_RIGHT;
 	}
 
 	return out_code;
@@ -193,7 +198,10 @@ bool BulletServer::_bullet_trajectory_valid(const Vector2 &p_pos, const Vector2 
 	if (clip_pos == 0) { return true; }
 	if (!play_area_allow_incoming) { return false; }
 	
-	int clip_dest = _compute_out_code(play_area_rect, p_pos + play_area_max_incoming_dist*p_dir);
+	int clip_dest = _compute_out_code(
+			play_area_rect, 
+			p_pos + MAX((play_area_rect.position + play_area_rect.size/2 - p_pos).length(), play_area_rect.size.length())*p_dir
+	);
 
 	if ((clip_pos & clip_dest) != 0) { return false; }
 
@@ -335,14 +343,6 @@ bool BulletServer::get_play_area_allow_incoming() const {
 	return play_area_allow_incoming;
 }
 
-void BulletServer::set_play_area_max_incoming_dist(float p_dist) {
-	play_area_max_incoming_dist = p_dist;
-}
-
-float BulletServer::get_play_area_max_incoming_dist() const {
-	return play_area_max_incoming_dist;
-}
-
 void BulletServer::set_relay_autoconnect(bool p_enabled) {
 	relay_autoconnect = p_enabled;
 }
@@ -394,9 +394,6 @@ void BulletServer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_play_area_allow_incoming", "allow_incoming"), &BulletServer::set_play_area_allow_incoming);
 	ClassDB::bind_method(D_METHOD("get_play_area_allow_incoming"), &BulletServer::get_play_area_allow_incoming);
 
-	ClassDB::bind_method(D_METHOD("set_play_area_max_incoming_dist", "max_incoming_dist"), &BulletServer::set_play_area_max_incoming_dist);
-	ClassDB::bind_method(D_METHOD("get_play_area_max_incoming_dist"), &BulletServer::get_play_area_max_incoming_dist);
-
 	ClassDB::bind_method(D_METHOD("set_relay_autoconnect", "relay_autoconnect"), &BulletServer::set_relay_autoconnect);
 	ClassDB::bind_method(D_METHOD("get_relay_autoconnect"), &BulletServer::get_relay_autoconnect);
 
@@ -410,7 +407,6 @@ void BulletServer::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::RECT2, "play_area_rect"), "set_play_area_rect", "get_play_area_rect");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "play_area_margin", PROPERTY_HINT_RANGE, "0,300,0.01,or_less,or_greater"), "set_play_area_margin", "get_play_area_margin");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "play_area_allow_incoming"), "set_play_area_allow_incoming", "get_play_area_allow_incoming");
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "play_area_max_incoming_dist", PROPERTY_HINT_RANGE, "0,10000,10,or_greater"), "set_play_area_max_incoming_dist", "get_play_area_max_incoming_dist");
 
 	ADD_GROUP("Relay", "relay_");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "relay_autoconnect"), "set_relay_autoconnect", "get_relay_autoconnect");
@@ -430,7 +426,6 @@ BulletServer::BulletServer() {
 	play_area_mode = VIEWPORT;
 	play_area_margin = 0;
 	play_area_rect = Rect2();
-	play_area_max_incoming_dist = 2000;
 	pop_on_collide = true;
 	relay_autoconnect = true;
 }
