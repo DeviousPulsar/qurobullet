@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="BulletTexture" inherits="Resource" version="4.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		A BulletPath defined by a Curve2D.
+	</brief_description>
+	<description>
+		A BulletPath where the motion is defined with an initial [code]speed[/code] and [code]rotation[/code]. This velocity will be modfied over time using the [code]linear_acceleration[/code] and [code]curve_rate[/code] terms.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="curve" type="Curve2D" setter="set_curve" getter="get_curve">
+            The Curve2D that defines the path. The first point of the curve is the effective (0,0) of the path. The bullet when spawned will progress as if spawned from the first point.
+		</member>
+		<member name="sampling_mode" type="int" setter="set_sampling_mode" getter="get_sampling_mode" default="1">
+			The way in which the Curve2D is sampled.
+			[code]SamplingMode.CONSTANT_SPEED[/code] samples the curve in fixed size steps such that a bullet will move a distance of [code]speed_modifier[/code] in a second.
+			[code]SamplingMode.VARIABLE_SPEED[/code] samples the curve such that a bullet will pass by [code]speed_modifier[/code] control points in a second.
+		</member>
+		<member name="speed_modifier" type="float" setter="set_speed_modifier" getter="get_speed_modifier" default="1">
+			A constant modfied that affects the speed of the bullet, based upon the current [code]sampling_mode[/code].
+		</member>
+		<member name="continue_on_complete" type="float" setter="set_continue_on_complete" getter="get_continue_on_complete" default="true">
+			Determines whether the bullet will destoy itself on completion of the path. If true, the bullet will continue past the end of the path, in the final direction of the path.
+		</member>
+	</members>
+	<constants>
+		<constant name="CONSTANT_SPEED" value="0" enum="SamplingMode">
+		</constant>
+		<constant name="VARIABLE_SPEED" value="1" enum="SamplingMode">
+		</constant>
+	</constants>
+</class>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="BulletTexture" inherits="Resource" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="BulletTexture" inherits="Resource" version="4.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		BulletPath for constant or linearlly changing speeds and rotations.
+		A BulletPath for useful for simple bullets.
 	</brief_description>
 	<description>
-		BulletPath for constant or linearlly changing speeds and rotations.
+		A BulletPath where the motion is defined with an initial [code]speed[/code] and [code]rotation[/code]. This velocity will be modfied over time using the [code]linear_acceleration[/code] and [code]curve_rate[/code] terms.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -25,7 +25,10 @@
 			The minimum speed the bullet may travel at. May be negative.
 		</member>
         <member name="rotation" type="float" setter="set_rotation" getter="get_rotation" default="0">
-			The maximium speed the bullet may travel at.
+			The rotation of the bullet upon spawn in radians
+		</member>
+		<member name="curve_rate" type="float" setter="set_curve_rate" getter="get_curve_rate" default="0">
+			The rate at which the rotation of the bullet changes in radians/second.
 		</member>
 	</members>
 </class>
