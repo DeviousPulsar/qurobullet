@@ -28,14 +28,6 @@ void BulletServerRelay::_bind_methods() {
 			PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "BulletTexture"), 
 			PropertyInfo(Variant::DICTIONARY, "custom_data")
 	));
-
-	/*ADD_SIGNAL(MethodInfo("volley_spawn_requested", 
-			PropertyInfo(Variant::OBJECT, "path", PROPERTY_HINT_RESOURCE_TYPE, "BulletPath"), 
-			PropertyInfo(Variant::VECTOR2, "position"), 
-			PropertyInfo(Variant::ARRAY, "shots"), 
-			PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "BulletTexture")
-			PropertyInfo(Variant::DICTIONARY, "custom_data")
-	));*/
 }
 
 BulletServerRelay::BulletServerRelay() {
