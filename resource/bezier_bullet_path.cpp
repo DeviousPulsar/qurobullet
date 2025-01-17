@@ -78,7 +78,7 @@ Ref<BulletPath> BezierBulletPath::rotated(float p_rotation) const {
     return Ref<BezierBulletPath>(memnew(BezierBulletPath(new_curve, mode, speed, continue_on_complete)));
 }
 
-Ref<BulletPath> BezierBulletPath::xformed(const Transform2D p_transform) const {
+Ref<BulletPath> BezierBulletPath::xformed(const Transform2D &p_transform) const {
     ERR_FAIL_COND_V_MSG(!curve.is_valid(), Ref<BezierBulletPath>(this), "Assigned curve is invalid. Cannot transform path."); 
 
     Vector2 init_point = curve->samplef(0);

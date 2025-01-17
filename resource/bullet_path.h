@@ -19,7 +19,7 @@ public:
     virtual float get_speed(float time) const = 0;
 
     virtual Ref<BulletPath> rotated(float p_rotation) const = 0;
-    virtual Ref<BulletPath> xformed(const Transform2D p_transform) const = 0;
+    virtual Ref<BulletPath> xformed(const Transform2D &p_transform) const = 0;
 };
 
 #endif

@@ -30,7 +30,7 @@ public:
     virtual float get_speed(float p_time) const override;
 
     virtual Ref<BulletPath> rotated(float p_rotation) const override;
-    virtual Ref<BulletPath> xformed(const Transform2D p_transform) const override;
+    virtual Ref<BulletPath> xformed(const Transform2D &p_transform) const override;
 
     void set_init_speed(float p_speed);
     float get_init_speed() const;

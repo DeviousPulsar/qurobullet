@@ -40,7 +40,7 @@ Ref<BulletPath> SimpleBulletPath::rotated(float p_rotation) const {
     )));
 }
 
-Ref<BulletPath> SimpleBulletPath::xformed(const Transform2D p_transform) const {
+Ref<BulletPath> SimpleBulletPath::xformed(const Transform2D &p_transform) const {
     Vector2 new_dir = p_transform.basis_xform(get_direction(0));
     float delta = new_dir.length();
 
