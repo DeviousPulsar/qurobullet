@@ -10,6 +10,7 @@
 #include "resource/bullet_path.h"
 #include "resource/simple_bullet_path.h"
 #include "resource/bezier_bullet_path.h"
+#include "resource/force_bullet_path.h"
 #include "resource/bullet_texture.h"
 
 #include "core/config/engine.h"
@@ -31,6 +32,7 @@ void initialize_qurobullet_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_ABSTRACT_CLASS(BulletPath);
 	GDREGISTER_CLASS(SimpleBulletPath);
 	GDREGISTER_CLASS(BezierBulletPath);
+	GDREGISTER_CLASS(ForceBulletPath);
 	
 	GDREGISTER_CLASS(BulletTexture);
 
