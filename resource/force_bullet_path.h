@@ -55,12 +55,12 @@ public:
     void set_rotate_forces_on_transform(bool p_rotate);
     bool get_rotate_forces_on_transform() const;
 
-    Ref<BulletPath> apply_force(const Vector2 &p_force, float p_time);
-    Ref<BulletPath> apply_impulse(const Vector2 &p_force, float p_time);
+    Ref<ForceBulletPath> apply_force(const Vector2 &p_force, float p_time);
+    Ref<ForceBulletPath> apply_impulse(const Vector2 &p_force, float p_time);
 
     ForceBulletPath();
     ForceBulletPath(const ForceBulletPath *p_other);
-    ForceBulletPath(float p_speed, float p_dir, const Vector2 &p_force, float p_lifetime = 0, float p_max_speed = 10000, bool p_rotate_forces_on_transform = false);
+    ForceBulletPath(float p_speed, float p_dir, const Vector2 &p_force, float p_lifetime = 0, float p_max_speed = 500, bool p_rotate_forces_on_transform = false);
     ~ForceBulletPath();
 };
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="BulletTexture" inherits="Resource" version="4.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
-		A BulletPath for useful for simple bullets.
+		A BulletPath useful for simple bullets.
 	</brief_description>
 	<description>
 		A BulletPath where the motion is defined with an initial [code]speed[/code] and [code]rotation[/code]. This velocity will be modfied over time using the [code]linear_acceleration[/code] and [code]curve_rate[/code] terms.
@@ -12,7 +12,7 @@
 		<member name="lifetime" type="float" setter="set_lifetime" getter="get_lifetime" default="0">
             The maximum lifetime of the bullet. If 0.0, bullet will not pop automatically from exceeding it's lifetime.
 		</member>
-		<member name="speed" type="float" setter="set_speed" getter="get_speed" default="100">
+		<member name="speed" type="float" setter="set_init_speed" getter="get_init_speed" default="100">
 			The speed of the bullet upon spawn. May be negative.
 		</member>
 		<member name="linear_acceleration" type="float" setter="set_linear_acceleration" getter="get_linear_acceleration" default="0">

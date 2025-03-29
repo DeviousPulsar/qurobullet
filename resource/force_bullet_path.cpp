@@ -94,20 +94,24 @@ bool ForceBulletPath::get_rotate_forces_on_transform() const {
     return rotate_forces_on_transform;
 }
 
-Ref<BulletPath> ForceBulletPath::apply_force(const Vector2 &p_force, float p_time) {
+Ref<ForceBulletPath> ForceBulletPath::apply_force(const Vector2 &p_force, float p_time) {
     Ref<ForceBulletPath> new_path = Ref<BulletPath>(memnew(ForceBulletPath()));
 
     new_path->force = force + p_force;
     new_path->init_velocity = get_velocity(p_time);
-    new_path->lifetime = lifetime - p_time;
+    new_path->lifetime = (lifetime == 0)? 0 : MIN(lifetime - p_time, 0.001);
     new_path->max_speed = max_speed;
+
+    return new_path;
 }
 
-Ref<BulletPath> ForceBulletPath::apply_impulse(const Vector2 &p_impulse, float p_time) {
+Ref<ForceBulletPath> ForceBulletPath::apply_impulse(const Vector2 &p_impulse, float p_time) {
     Ref<ForceBulletPath> new_path = Ref<BulletPath>(memnew(ForceBulletPath(this)));
 
     new_path->init_velocity = get_velocity(p_time) + p_impulse;
-    new_path->lifetime = lifetime - p_time;
+    new_path->lifetime = (lifetime == 0)? 0 : MIN(lifetime - p_time, 0.001);
+
+    return new_path;
 }
 
 void ForceBulletPath::_bind_methods() {
@@ -133,7 +137,7 @@ void ForceBulletPath::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_init_rotation", "direction"), &ForceBulletPath::set_init_rotation);
     ClassDB::bind_method(D_METHOD("get_init_rotation"), &ForceBulletPath::get_init_rotation);
 
-    ClassDB::bind_method(D_METHOD("set_max_speed", "speed_clamp"), &ForceBulletPath::set_max_speed);
+    ClassDB::bind_method(D_METHOD("set_max_speed", "max_speed"), &ForceBulletPath::set_max_speed);
     ClassDB::bind_method(D_METHOD("get_max_speed"), &ForceBulletPath::get_max_speed);
 
     ClassDB::bind_method(D_METHOD("set_force", "force"), &ForceBulletPath::set_force);
@@ -142,11 +146,13 @@ void ForceBulletPath::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_rotate_forces_on_transform", "rotate"), &ForceBulletPath::set_rotate_forces_on_transform);
     ClassDB::bind_method(D_METHOD("get_rotate_forces_on_transform"), &ForceBulletPath::get_rotate_forces_on_transform);
 
+    ClassDB::bind_method(D_METHOD("apply_force", "force", "time"), &ForceBulletPath::apply_force);
+    ClassDB::bind_method(D_METHOD("apply_impulse", "impulse", "time"), &ForceBulletPath::apply_impulse);
 
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "lifetime", PROPERTY_HINT_RANGE, "0,30,0.01,or_greater"), "set_lifetime", "get_lifetime");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "speed", PROPERTY_HINT_RANGE, "0,500,1,or_greater"), "set_init_speed", "get_init_speed");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "rotation", PROPERTY_HINT_RANGE, "-360,360,0.1,radians_as_degrees"), "set_init_rotation", "get_init_rotation");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_speed", PROPERTY_HINT_RANGE, "0,500,0.1,or_greater"), "set_max_speed", "get_max_speed");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "max_speed", PROPERTY_HINT_RANGE, "0,2000,0.1,or_greater"), "set_max_speed", "get_max_speed");
     ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "force"), "set_force", "get_force");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "rotate_forces_on_transform"), "set_rotate_forces_on_transform", "get_rotate_forces_on_transform");
 }

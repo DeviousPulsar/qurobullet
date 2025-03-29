@@ -1,7 +1,3 @@
-Pre-built editor and template binaries for Godot 4.1.2 with qurobullet included can now be found [here](https://github.com/quinnvoker/godot-qurobullet/releases/tag/v1.2.1-godot-4.1.2)!
-
-_Note: The `main` branch contains code for Godot 4.x compatility. If you're using Godot 3.x, you want the `godot-3.x` branch instead! The last Godot 3.x-compatible tag is `v1.1`, and the first 4.x-compatible tag is `v1.2`._
-
 # qurobullet
 
 A powerful 2D projectile system module for Godot!
@@ -10,11 +6,12 @@ A powerful 2D projectile system module for Godot!
 
 **qurobullet** provides a means of easily creating and processing thousands of configurable 2D projectiles in Godot. It handles the heavy-lifting of spawning, movement, and collision detection for large groups of bullets, and gives the user tools for designing bullet-hell-worthy patterns!
 
-It consists of three main components: the `BulletServer` and `BulletSpawner` nodes, and the `BulletType` resource.
+It consists of four main components: the `BulletServer` and `BulletSpawner` nodes, and the `BulletPath` and `BulletTexture` resources.
 
 - A `BulletServer` creates a configurable pool of bullet objects (not nodes), controls their movement, and reports their collisions. The bullet pool does not grow, and recycles the oldest bullets if overloaded.
-- A `BulletSpawner` calculates various arrangements to spawn bullets in, and "spawns" bullets by sending a signal to a `BulletServer` containing the positions, directions, and `BulletType` desired. It features a preview drawing system which shows the positions and directions their bullets will travel, which simplifies the process of creating new patterns via `AnimationPlayer` .
-- A `BulletType` is a container for bullet data, and bullets' appearance and behaviour are determined by the type they hold. Contains a dictionary called `custom_data` which can be used for easy extension of the type (for example, you could give it an `AudioStream` to associate the type with custom hit sound).
+- A `BulletSpawner` calculates various arrangements to spawn bullets in, and "spawns" bullets by sending a signal to a `BulletServer` containing the positions, directions, `BulletPath`, `BulletTexture`, and custom data desired. It features a preview drawing system which shows the positions and directions their bullets will travel, which simplifies the process of creating new patterns via `AnimationPlayer` .
+- A `BulletPath` provides the information about the bullet's motion through the use of it's `get_step` function. This function calculates the motion of the bullet over that a time step. There are 3 provided implementations of `BulletPath`: `SimpleBulletPath`, `BezierBulletPath`, and `ForceBulletPath`.
+- A `BulletTexture` provieds the information about the bullet's texture and collision.
 
 More specific information about these components and their properties can be found in the built-in documentation.
 
@@ -23,6 +20,8 @@ More specific information about these components and their properties can be fou
 Because **qurobullet** is a module, it must be added to the modules folder of Godot's source and compiled into a custom build. If you are unfamiliar with the process of compiling software from source, [Godot's documentation can point you in the right direction for any platform](https://docs.godotengine.org/en/stable/development/compiling/index.html).
 
 This module does not have dependencies beyond those required to build Godot.
+
+Due to configuration issues, this module must be compiled with gcc/mingw - I will fix this at a later date.
 
 The installation method can vary a bit, depending on your OS and whether you're cloning Godot's git repo or downloading a zipped version (and whether you want to keep the module up to date with this repository), but so long as all of the source files from this repository end up in `<your_godot_source_folder>/modules/qurobullet`, you're all set to compile the engine as normal, and **qurobullet** will be included!
 
@@ -49,36 +48,24 @@ Because all communication between components is done via signals, **qurobullet**
 
 `spawn_bullet` spawns a single bullet, and expects the following arguments:
 
-- The `BulletType` to use
+- The `BulletPath` and `BulletTexture` to use
 - The starting position of the bullet in world space, as a `Vector2`
 - The direction in which the bullet will travel, as a `Vector2` (must be normalised)
+- A optional `Dictionary` of custom data to be added to the bullet
 
 `spawn_volley` spawns any number of bullets at once, and expects the following arguments:
 
-- The `BulletType` to use
+- The `BulletPath` and `BulletTexture` to use
 - The origin of the spawner in world space, as a `Vector2`
 - An `Array` containing spawn info for each shot. This spawn info is stored as a `Dictionary` containing two entries, _"position"_ (bullet spawn position relative to origin, as a `Vector2`), and _"direction"_ (bullet travel direction, also a `Vector2`, and must be normalised)
+- A optional `Dictionary` of custom data to be added to all the bullets
 
 Knowing this, you can spawn bullets any way you wish via code! You could even code your own `BulletServer` implementation, if all you needed was a configurable spawner and bullet data definition...
+
+In addition you may create custom implementations of `BulletPath`, thus allowing for fully customizable bullet trajectories and behaviors. See the documentation for more details on the `BulletPath` type
 
 ## Known Issues
 
 - Combining the use of `arc_offset` and `MANUAL` pattern mode in `BulletSpawner` is not recommended and results in undesired behaviour, because `arc_offset`'s shot wrapping (applied when a shot would be offset beyond the arc's range) modifies shot indices.
 - Bullets set to collide with Area2Ds will ignore their `monitorable` status and always see them.
 - `BulletSpawner` does its best to prevent "stacking" bullets by combining them into one if both their directions and spawn positions are approximately equal when spawned. However, this is not a guarantee, and spawners can still stack bullets when shots are scattered individually.
-
-## Note from the author
-
-_It's finally here! After 6 months of development and multiple rewrites, **qurobullet** 1.0 is complete, and the project is now open source!_
-
-_It started off as a simple bullet spawning node written in GDScript, and began to immediately take off in complexity when I decided to try writing a visualiser for planning waves... Suddenly, with the shots appearing in front of me, all I could think was "okay, but what if I could try making it do THIS" and adding layer upon layer of configuration options. I got a lot of positive feedback from the Godot subreddit and wanted to try making a tool that others could benefit from._
-
-_After a few months, it showed signs that it could collapse under its own weight... The systems were getting more convoluted and harder to change, adding new features began to hurt performance noticeably, etc. It was time for a rewrite. While I could have stuck to GDScript and still improved peformance, I decided to try C++, as I'd always been somewhat intimidated to use it and this seemed like a good opportunity to conquer that fear._
-
-_I went with module development rather than GDNative C++ script, because I wanted to get more familiar with how Godot works and working directly with the source gave me a lot of closely related reference material to draw from as a new C++ user. The rewrite went smoothly, and now I've achieved kinds of functionality and better performance than I ever imagined early on!_
-
-**_qurobullet_** _has been a blast to work on, and it (as well as the support of the Godot community) has given me a lot more confidence in myself as a programmer... I've always sort of drifted along on minimum wage jobs doing whatever pays bills, but I think at this point I want to get serious and try and turn programming a living, somehow. Thank you all for everything!_
-
-_So here it is. Do whatever you want with it! I hope you like it._
-
--quinn 2020-05-08

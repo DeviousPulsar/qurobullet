@@ -59,8 +59,8 @@ public:
 	BulletServer();
 	~BulletServer();
 
-	void spawn_bullet(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Vector2 &p_direction, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data);
-	void spawn_volley(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Array &p_volley, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data);
+	void spawn_bullet(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Vector2 &p_direction, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data = Dictionary());
+	void spawn_volley(const Ref<BulletPath> &p_path, const Vector2 &p_position, const Array &p_volley, const Ref<BulletTexture> &p_texture, const Dictionary &p_custom_data = Dictionary());
 
 	void clear_bullets();
 	int get_live_bullet_count();

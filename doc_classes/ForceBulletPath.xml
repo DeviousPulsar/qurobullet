@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="BulletTexture" inherits="Resource" version="4.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+    <brief_description>
+        A BulletPath defined by a continually applied Vector2D force
+    </brief_description>
+    <description>
+        A BulletPath where the motion is defined with an initial [code]speed[/code] and [code]rotation[/code]. This velocity will be modfied over time using [code]force[/code]
+    </description>
+    <tutorials>
+    </tutorials>
+    <methods>
+        <method name="apply_force">
+            <return type="ForceBulletPath" />
+            <param index="0" name="force" type="Vector2" />
+            <param index="1" name="time" type="float" />
+            <description>
+                Creates a new [code]ForceBulletPath[/code] where the initial velocity is equal to the source path's velocity at [code]time[/code] and alters the aplied force by [code]force[/code].
+            </description>
+        </method>
+        <method name="apply_impulse">
+            <return type="ForceBulletPath" />
+            <param index="0" name="impulse" type="Vector2" />
+            <param index="1" name="time" type="float" />
+            <description>
+                Creates a new [code]ForceBulletPath[/code] where the initial velocity is equal to the source path's velocity at [code]time[/code] plus the given impulse.
+            </description>
+        </method>
+    </methods>
+    <members>
+        <member name="lifetime" type="float" setter="set_lifetime" getter="get_lifetime" default="0">
+            The maximum lifetime of the bullet. If 0.0, bullet will not pop automatically from exceeding it's lifetime.
+        </member>
+        <member name="speed" type="float" setter="set_init_speed" getter="get_init_speed" default="100">
+            The speed of the bullet upon spawn. May be negative.
+            Note: ForceBulletPath's [code]get_speed[/code] method will never return a negative value
+        </member>
+        <member name="max_speed" type="float" setter="set_max_speed" getter="get_max_speed" default="500">
+            The maximium speed the bullet may travel at.
+        </member>
+        <member name="rotation" type="float" setter="set_rotation" getter="get_rotation" default="0">
+            The rotation of the bullet upon spawn in radians
+        </member>
+        <member name="force" type="Vector2D" setter="set_force" getter="get_force">
+            The force to be applied to the bullet.
+        </member>
+        <member name="rotate_forces_on_transform" type="bool" setter="set_rotate_forces_on_transform" getter="get_rotate_forces_on_transform" default="false">
+            Determines whether the applied force will be rotated when shot or when otherwise transformed by [code]rotated[/code] and [code]xformed[/code]
+        </member>
+    </members>
+</class>

@@ -19,7 +19,7 @@ void Bullet::update(float delta) {
 	position += path->get_step(time, delta);
 	time += delta;
 
-	if (!Math::is_zero_approx(path->get_lifetime()) && time > path->get_lifetime()) {
+	if (path->get_lifetime() >= 0.001 && time > path->get_lifetime()) {
 		pop(Bullet::POPPED_LIFETIME_BULLET);
 	}
 }
