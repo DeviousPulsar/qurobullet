@@ -47,6 +47,7 @@ void BulletServer::_notification(int p_what) {
 
 void BulletServer::_process_bullets(float delta) {
 	ERR_FAIL_COND(!is_inside_tree());
+
 	Vector<int> bullet_indices_to_clear;
 	PhysicsDirectSpaceState2D* space_state = get_viewport()->find_world_2d()->get_direct_space_state();
 	Dictionary collision_info = Dictionary();
@@ -54,7 +55,6 @@ void BulletServer::_process_bullets(float delta) {
 
 	for (int i = 0; i < live_bullets.size(); i++) {
 		Bullet* bullet = live_bullets[i];
-		RS::get_singleton()->canvas_item_set_draw_index(bullet->get_ci_rid(), i);
 
 		if (bullet->is_popped()) {
 			bullet_indices_to_clear.push_back(i);
